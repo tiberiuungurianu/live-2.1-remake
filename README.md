@@ -1,55 +1,30 @@
-# TIBERIU — full personal site
+# TIBERIU — official site
 
-A static, mobile-first personal site designed to replace Linktree while also working as a creator and modelling portfolio.
+Static personal website for Tiberiu Ungurianu. Editorial, image-led, identity-first.
+
+## Stack
+
+No build step. Upload the folder as-is.
+
+- `index.html` — page + SEO
+- `styles.css` — visual system
+- `script.js` — nav, reveals, theme
+- `images/` — WebP delivery + JPG sources
 
 ## Sections
 
-- Home / hero
-- About
-- Modelling
-- Around the web
-- Email
+1. Hero
+2. Selected
+3. About
+4. Notes (evergreen credentials)
+5. Contact
 
-There is intentionally no software-engineering section.
+External profiles live in **Menu** (desktop + mobile).
 
-## Photos
+## Local
 
-The site serves compressed `.webp` files from `images/`. Original JPGs in the same folder are source files only.
+```bash
+python3 -m http.server 8000
+```
 
-- `tiberiu-ungurianu-portrait.webp` — homepage hero
-- `tiberiu-ungurianu-beauty-editorial.webp` — tall modelling shot
-- `tiberiu-ungurianu-editorial-closeup.webp`
-- `tiberiu-ungurianu-sunglasses-editorial.webp`
-- `tiberiu-ungurianu-leather-editorial.webp`
-- `tiberiu-ungurianu-back-to-roots.webp`
-
-WebP versions are resized to ~1600–2000 px on the long side. Keep originals if you need to re-export.
-
-## Current links
-
-Hero:
-- Instagram
-- TikTok
-- YouTube
-
-Around the web:
-- Famous Birthdays
-- Pinterest
-- Snapchat
-- Telegram
-- Amazon wishlist
-- Contact email
-
-Edit any `href="..."` inside `index.html` to update them.
-
-## Deploy
-
-No build step is required. Upload the folder directly to:
-
-- Cloudflare Pages
-- Vercel
-- Netlify
-- GitHub Pages
-- Any standard static web host
-
-For a custom domain, point the domain at whichever host you choose.
+Open http://localhost:8000

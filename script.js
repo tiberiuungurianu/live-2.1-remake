@@ -1,135 +1,270 @@
+const topbar = document.querySelector('.topbar');
+const menuBtn = document.getElementById('menuBtn');
 const menu = document.getElementById('menu');
-const menuTrigger = document.getElementById('menuTrigger');
-const progress = document.getElementById('progress');
+const year = document.getElementById('year');
+const toTop = document.getElementById('toTop');
+const hero = document.querySelector('.hero');
+const heroMedia = document.querySelector('.hero-media');
+const heroImg = document.querySelector('.hero-media img');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const coarsePointer = matchMedia('(pointer: coarse), (hover: none)').matches;
+const canHeroMotion = !reduceMotion && !coarsePointer;
 
-function setMenu(open) {
-  menu.classList.toggle('open', open);
-  menuTrigger.setAttribute('aria-expanded', String(open));
-  menuTrigger.textContent = open ? 'Close' : 'Menu';
-  document.body.style.overflow = open ? 'hidden' : '';
+let lastFocus = null;
+let closeTimer = null;
+
+if (year) year.textContent = String(new Date().getFullYear());
+
+function menuLinks() {
+  return menu ? Array.from(menu.querySelectorAll('a, button')) : [];
 }
 
-menuTrigger.addEventListener('click', () => setMenu(!menu.classList.contains('open')));
-menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => setMenu(false)));
-document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+function isOpen() {
+  return menuBtn && menuBtn.getAttribute('aria-expanded') === 'true';
+}
 
-const reveals = document.querySelectorAll('.reveal');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('in');
-      observer.unobserve(entry.target);
+function openMenu() {
+  if (!menu || !menuBtn) return;
+  if (closeTimer) {
+    clearTimeout(closeTimer);
+    closeTimer = null;
+  }
+
+  lastFocus = document.activeElement;
+  menu.hidden = false;
+  requestAnimationFrame(() => menu.classList.add('is-open'));
+  menuBtn.setAttribute('aria-expanded', 'true');
+  menuBtn.textContent = 'Close';
+  document.body.style.overflow = 'hidden';
+  topbar?.setAttribute('data-theme', 'dark');
+
+  const first = menuLinks()[0];
+  if (first) first.focus({ preventScroll: true });
+}
+
+function closeMenu() {
+  if (!menu || !menuBtn || !isOpen()) return;
+
+  menu.classList.remove('is-open');
+  menuBtn.setAttribute('aria-expanded', 'false');
+  menuBtn.textContent = 'Menu';
+  document.body.style.overflow = '';
+
+  closeTimer = window.setTimeout(() => {
+    if (!menu.classList.contains('is-open')) menu.hidden = true;
+    closeTimer = null;
+  }, reduceMotion ? 0 : 380);
+
+  if (lastFocus && typeof lastFocus.focus === 'function') {
+    lastFocus.focus({ preventScroll: true });
+  } else {
+    menuBtn.focus({ preventScroll: true });
+  }
+
+  updateScrollUI();
+}
+
+if (menuBtn && menu) {
+  menuBtn.addEventListener('click', () => {
+    if (isOpen()) closeMenu();
+    else openMenu();
+  });
+
+  menu.addEventListener('click', (e) => {
+    if (e.target.closest('a')) closeMenu();
+  });
+
+  document.querySelector('.brand')?.addEventListener('click', () => {
+    if (isOpen()) closeMenu();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (!isOpen()) return;
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeMenu();
+      return;
+    }
+
+    if (e.key !== 'Tab') return;
+
+    const links = menuLinks();
+    if (!links.length) return;
+
+    const first = links[0];
+    const last = links[links.length - 1];
+    const active = document.activeElement;
+
+    if (e.shiftKey && (active === first || active === menuBtn)) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && active === last) {
+      e.preventDefault();
+      menuBtn.focus();
     }
   });
-}, { threshold: .12 });
-reveals.forEach(el => observer.observe(el));
+}
 
-document.querySelectorAll('img').forEach(img => {
-  const show = () => img.classList.add('is-loaded');
+if (canHeroMotion) {
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.14, rootMargin: '0px 0px -8% 0px' });
+  reveals.forEach((el) => observer.observe(el));
+} else {
+  document.querySelectorAll('.reveal').forEach((el) => el.classList.add('in'));
+}
+
+document.querySelectorAll('img').forEach((img) => {
+  const show = () => {
+    img.classList.add('is-loaded');
+    if (img === heroImg && canHeroMotion) {
+      window.setTimeout(() => {
+        heroImg.style.transition = 'opacity 0.45s linear, transform 0.01ms linear';
+        updateHeroMotion();
+      }, 1500);
+    }
+  };
   if (img.complete && img.naturalWidth) show();
   else img.addEventListener('load', show, { once: true });
 });
 
-const coarsePointer = matchMedia('(pointer: coarse), (hover: none)').matches;
+function updateTopbarTheme() {
+  if (!topbar) return;
+  if (isOpen()) {
+    topbar.setAttribute('data-theme', 'dark');
+    return;
+  }
 
-function updateProgress() {
-  if (!progress || coarsePointer) return;
-  const max = document.documentElement.scrollHeight - window.innerHeight;
-  const ratio = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-  progress.style.transform = `scaleX(${ratio})`;
+  topbar.setAttribute('data-theme', themeAtY(28));
 }
 
-const topbar = document.querySelector('.topbar');
-const lightSections = document.querySelectorAll('.about, .links-section');
-function updateTopbar() {
-  const probe = 28;
-  let onLight = false;
-  for (const section of lightSections) {
+function themeAtY(probeY) {
+  const sections = document.querySelectorAll('main [data-theme]');
+  let theme = 'dark';
+
+  for (const section of sections) {
     const box = section.getBoundingClientRect();
-    if (box.top <= probe && box.bottom >= probe) {
-      onLight = true;
+    if (box.top <= probeY && box.bottom >= probeY) {
+      theme = section.getAttribute('data-theme') || 'dark';
       break;
     }
   }
-  topbar.classList.toggle('on-light', onLight);
+
+  return theme;
 }
 
-let scrollTicking = false;
-function updateScrollUI() {
-  updateProgress();
-  updateTopbar();
-  scrollTicking = false;
+function updateToTop() {
+  if (!toTop) return;
+  const show = window.scrollY > (window.innerHeight * 0.7);
+  toTop.classList.toggle('is-visible', show);
+
+  const probeY = window.innerHeight - 40;
+  toTop.setAttribute('data-theme', themeAtY(probeY));
 }
 
-addEventListener('scroll', () => {
-  if (!scrollTicking) {
-    requestAnimationFrame(updateScrollUI);
-    scrollTicking = true;
+function updateHeroMotion() {
+  if (!hero || !heroImg) return;
+
+  const rect = hero.getBoundingClientRect();
+  const view = window.innerHeight || 1;
+  if (rect.bottom <= 0 || rect.top >= view) {
+    if (heroMedia) heroMedia.style.opacity = '0';
+    return;
   }
-}, { passive: true });
+
+  const progress = Math.min(1, Math.max(0, -rect.top / Math.max(rect.height, 1)));
+  const fade = 1 - progress * 1.15;
+  if (heroMedia) heroMedia.style.opacity = String(Math.max(0, fade));
+
+  if (!canHeroMotion || !heroImg.classList.contains('is-loaded')) return;
+
+  const shift = progress * 10;
+  const zoom = 1.02 + progress * 0.04;
+  heroImg.style.transform = `scale(${zoom}) translate3d(0, ${shift}%, 0)`;
+}
+
+let ticking = false;
+function updateScrollUI() {
+  updateTopbarTheme();
+  updateHeroMotion();
+  updateToTop();
+  ticking = false;
+}
+
+function onScroll() {
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(updateScrollUI);
+}
+
+if (toTop) {
+  toTop.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+}
+
+addEventListener('scroll', onScroll, { passive: true });
 addEventListener('resize', () => requestAnimationFrame(updateScrollUI));
 updateScrollUI();
 
-function externalAnchor(href, className) {
+function externalAnchor(href, label) {
   const anchor = document.createElement('a');
-  anchor.className = className;
   anchor.href = href;
   anchor.target = '_blank';
   anchor.rel = 'noopener noreferrer';
+  anchor.textContent = label;
   return anchor;
 }
 
 function applyLinks(data) {
   const links = Array.isArray(data.links) ? data.links.filter((link) => link && link.href && link.label) : [];
-  const shown = links.filter((link) => link.visible !== false);
 
-  const hero = document.querySelector('.hero-actions');
-  if (hero) {
-    hero.replaceChildren(...shown.filter((link) => link.hero).map((link) => {
-      const anchor = externalAnchor(link.href, 'pill');
-      anchor.setAttribute('aria-label', [link.label, link.detail].filter(Boolean).join(' '));
-      const name = document.createElement('span');
-      name.textContent = link.label;
-      const arrow = document.createElement('span');
-      arrow.textContent = '↗';
-      anchor.append(name, arrow);
+  const menuLinks = document.querySelector('.menu-links');
+  if (menuLinks) {
+    const items = links.map((link) => {
+      const anchor = externalAnchor(link.href, '');
+      const label = document.createElement('span');
+      label.textContent = link.label;
+      const detail = document.createElement('span');
+      detail.textContent = link.detail || '';
+      anchor.replaceChildren(label, detail);
       return anchor;
-    }));
+    });
+    menuLinks.replaceChildren(...items);
   }
 
-  const stack = document.querySelector('.link-stack');
-  if (stack) {
-    stack.replaceChildren(...shown.filter((link) => !link.hero).map((link) => {
-      const anchor = externalAnchor(link.href, 'big-link');
-      const name = document.createElement('span');
-      name.textContent = link.label;
-      const arrow = document.createElement('span');
-      arrow.textContent = '↗';
-      anchor.append(name, arrow);
-      if (link.detail) {
-        const note = document.createElement('span');
-        note.className = 'visually-hidden';
-        note.textContent = link.detail;
-        anchor.append(note);
-      }
-      return anchor;
-    }));
+  const heroSocial = document.querySelector('.hero-social');
+  if (heroSocial) {
+    heroSocial.replaceChildren(
+      ...links.filter((link) => link.hero).map((link) => externalAnchor(link.href, link.label))
+    );
   }
 
-  const email = document.querySelector('.contact-email');
+  const verifiedItem = document.querySelector('[data-verified]');
+  const verified = links.find((link) => link.verified);
+  if (verifiedItem) {
+    const slot = verifiedItem.querySelector('strong');
+    if (verified && slot) {
+      const anchor = externalAnchor(verified.href, verified.label);
+      anchor.classList.add('quiet-link');
+      slot.replaceChildren(anchor);
+      verifiedItem.hidden = false;
+    } else {
+      verifiedItem.hidden = true;
+    }
+  }
+
+  const email = document.querySelector('.email');
   if (email && data.email && data.email.href) {
     email.href = data.email.href;
-    const label = data.email.label || data.email.href.replace(/^mailto:/, '');
-    const at = label.indexOf('@');
-    if (at > 0) {
-      email.replaceChildren(
-        document.createTextNode(label.slice(0, at)),
-        document.createElement('br'),
-        document.createTextNode(label.slice(at))
-      );
-    } else {
-      email.textContent = label;
-    }
+    email.textContent = data.email.label || data.email.href.replace(/^mailto:/, '');
   }
 
   const structured = document.querySelector('script[type="application/ld+json"]');
@@ -139,7 +274,7 @@ function applyLinks(data) {
     const graph = JSON.parse(structured.textContent);
     const person = graph['@graph']?.find((node) => node['@type'] === 'Person');
     if (!person) return;
-    person.sameAs = links.filter((link) => link.sameAs !== false).map((link) => link.href);
+    person.sameAs = links.map((link) => link.href);
     structured.textContent = JSON.stringify(graph);
   } catch {
     /* leave the structured data as published */

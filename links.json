@@ -8,7 +8,8 @@
       "label": "TikTok",
       "detail": "@tiberiu",
       "href": "https://www.tiktok.com/@tiberiu",
-      "hero": true
+      "hero": true,
+      "verified": true
     },
     {
       "label": "TikTok II",
@@ -36,26 +37,6 @@
       "label": "Famous Birthdays",
       "detail": "Profile",
       "href": "https://www.famousbirthdays.com/people/tiberiu-ungurianu.html"
-    },
-    {
-      "label": "Pinterest",
-      "detail": "tiberiuseptimiu",
-      "href": "https://www.pinterest.co.uk/tiberiuseptimiu/"
-    },
-    {
-      "label": "Snapchat",
-      "detail": "tiberiungurianu",
-      "href": "https://www.snapchat.com/add/tiberiungurianu"
-    },
-    {
-      "label": "Wishlist",
-      "href": "https://www.amazon.co.uk/hz/wishlist/ls/NGODZZNVYEVX?ref_=wl_share",
-      "sameAs": false
-    },
-    {
-      "label": "Linktree",
-      "href": "https://linktr.ee/tiberiu.ungurianu",
-      "visible": false
     }
   ]
 }
