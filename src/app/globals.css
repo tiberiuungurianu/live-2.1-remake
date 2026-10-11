@@ -2,6 +2,12 @@
 @import "../styles/tokens.css";
 
 @theme inline {
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-newsprint: var(--newsprint);
+  --color-paper: var(--paper);
+  --color-oxblood: var(--oxblood);
+  --color-smoke: var(--smoke);
   --color-bg: var(--bg);
   --color-bg-secondary: var(--bg-secondary);
   --color-ivory: var(--ivory);
@@ -28,7 +34,7 @@ html {
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--bg);
+  background: var(--ink);
   color: var(--text);
   font-family: var(--font-utility), "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-synthesis: none;
@@ -57,8 +63,8 @@ button {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--burgundy) 70%, black);
-  color: var(--ivory);
+  background: var(--oxblood);
+  color: var(--paper);
 }
 
 .skip-link {
@@ -67,10 +73,11 @@ button {
   top: -100px;
   z-index: 1000;
   padding: 10px 14px;
-  background: var(--ivory);
+  background: var(--paper);
   color: var(--text-on-light);
-  font-size: 13px;
-  letter-spacing: 0.06em;
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -97,90 +104,103 @@ button {
 }
 
 .section-pad {
-  padding-block: clamp(72px, 12vw, 160px);
+  padding-block: clamp(56px, 10vw, 120px);
 }
 
-.eyebrow {
-  margin: 0 0 16px;
+.kicker {
+  margin: 0;
+  font-family: var(--font-mono), ui-monospace, monospace;
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--smoke);
+}
+
+.masthead {
+  margin: 0;
+  font-family: var(--font-display), Impact, "Arial Narrow", sans-serif;
+  font-weight: 400;
+  line-height: 0.78;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
 }
 
 .display-title {
   margin: 0;
-  font-family: var(--font-display), "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 700;
-  font-size: clamp(48px, 10vw, 120px);
-  line-height: 0.9;
-  letter-spacing: -0.04em;
+  font-family: var(--font-display), Impact, "Arial Narrow", sans-serif;
+  font-weight: 400;
+  font-size: clamp(56px, 12vw, 148px);
+  line-height: 0.82;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
 }
 
 .editorial-copy {
   margin: 0;
   font-family: var(--font-editorial), Georgia, "Times New Roman", serif;
-  font-size: clamp(18px, 2.2vw, 26px);
-  line-height: 1.45;
-  letter-spacing: -0.01em;
+  font-size: clamp(18px, 2.1vw, 24px);
+  line-height: 1.4;
+  letter-spacing: -0.015em;
 }
 
-.phase-note {
-  margin: 24px 0 0;
-  max-width: 42ch;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.5;
+.pull-quote {
+  margin: 0;
+  font-family: var(--font-editorial), Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(28px, 5.2vw, 64px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
 }
 
-/* Topbar contrast: keep brand + menu readable on ivory sections */
+/* Topbar contrast across ink / newsprint spreads */
 header[data-on-light="false"] .topbar-brand,
 header[data-on-light="false"] .topbar-menu,
 header[data-on-light="false"] .topbar-nav {
-  color: #f2efe9;
+  color: var(--paper);
 }
 
 header[data-on-light="false"] .topbar-nav {
-  color: rgba(242, 239, 233, 0.84);
+  color: rgba(242, 235, 224, 0.78);
 }
 
 header[data-on-light="true"] .topbar-brand,
 header[data-on-light="true"] .topbar-menu,
 header[data-on-light="true"] .topbar-nav,
 header[data-on-light="true"] .topbar-nav a {
-  color: #111111;
+  color: var(--ink);
 }
 
 header[data-on-light="true"] .topbar-nav a:hover,
 header[data-on-light="true"] .topbar-brand:hover,
 header[data-on-light="true"] .topbar-menu:hover {
-  color: #000000;
+  color: var(--oxblood);
 }
 
 .scroll-cue {
-  animation: scroll-cue 2.4s var(--ease-editorial) infinite;
+  animation: scroll-cue 2.6s var(--ease-editorial) infinite;
 }
 
 @keyframes scroll-cue {
   0%,
   100% {
-    opacity: 0.55;
+    opacity: 0.5;
     transform: translateY(0);
   }
   50% {
     opacity: 1;
-    transform: translateY(4px);
+    transform: translateY(5px);
   }
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .interactive-shift {
-    transition: transform 0.28s var(--ease-editorial), opacity 0.28s ease;
+  .type-nudge {
+    transition: transform var(--duration-hover) var(--ease-editorial), color var(--duration-hover) ease;
   }
 
-  .interactive-shift:hover {
-    transform: translateX(8px);
+  .type-nudge:hover {
+    transform: translateX(10px);
+    color: var(--oxblood);
   }
 }
 
@@ -189,8 +209,8 @@ header[data-on-light="true"] .topbar-menu:hover {
     animation: none;
   }
 
-  .interactive-shift,
-  .interactive-shift:hover {
+  .type-nudge,
+  .type-nudge:hover {
     transition: none;
     transform: none;
   }

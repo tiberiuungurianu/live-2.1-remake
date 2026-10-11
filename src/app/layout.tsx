@@ -1,28 +1,36 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo_Narrow, DM_Sans, Instrument_Serif } from "next/font/google";
+import { Anton, IBM_Plex_Mono, Newsreader, Space_Grotesk } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { site } from "@/content/site";
 import { sameAsLinks } from "@/content/links";
 import "./globals.css";
 
-const display = Archivo_Narrow({
+const display = Anton({
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  weight: ["400"],
   variable: "--font-display",
   display: "swap",
 });
 
-const editorial = Instrument_Serif({
+const editorial = Newsreader({
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["400", "500", "600"],
   style: ["normal", "italic"],
   variable: "--font-editorial",
   display: "swap",
 });
 
-const utility = DM_Sans({
+const utility = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-utility",
+  display: "swap",
+});
+
+const mono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -137,7 +145,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-GB"
-      className={`${display.variable} ${editorial.variable} ${utility.variable}`}
+      className={`${display.variable} ${editorial.variable} ${utility.variable} ${mono.variable}`}
     >
       <body>
         <script
@@ -145,6 +153,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData()) }}
         />
         {children}
+        <Analytics />
       </body>
     </html>
   );
