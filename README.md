@@ -1,30 +1,40 @@
-# TIBERIU — official site
+# TIBERIU 2.0
 
-Static personal website for Tiberiu Ungurianu. Editorial, image-led, identity-first.
+Personal editorial website for Tiberiu Ungurianu.
+
+Development happens on `live2.0`. Production remains on `main`.
 
 ## Stack
 
-No build step. Upload the folder as-is.
-
-- `index.html` — page + SEO
-- `styles.css` — visual system
-- `script.js` — nav, reveals, theme
-- `images/` — WebP delivery + JPG sources
-
-## Sections
-
-1. Hero
-2. Selected
-3. About
-4. Notes (evergreen credentials)
-5. Contact
-
-External profiles live in **Menu** (desktop + mobile).
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- Motion for React (installed; used from Phase 2)
+- Vercel
 
 ## Local
 
 ```bash
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Open http://localhost:8000
+Open http://localhost:3000
+
+## Content
+
+Editable typed content lives in:
+
+- `src/content/site.ts`
+- `src/content/links.ts`
+- `src/content/gallery.ts`
+
+## Safety
+
+- Do not merge into `main` without explicit approval
+- Keep the Vercel production branch on `main`
+- Preview deployments only for `live2.0`
+
+## Legacy
+
+The previous static redesign is archived in `_legacy/` for reference during migration.
